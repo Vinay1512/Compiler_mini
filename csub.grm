@@ -1,0 +1,214 @@
+structure AST = Abstract;
+
+fun createx x = AST.EXPR(x);
+
+fun createstruc (NONE,y) = {name=y,ctype=AST.Undetermined}
+  | createstruc (SOME x,y) = {name=y,ctype=x};
+fun createfor x = AST.STMT(AST.For(x))
+
+fun createwhile x= AST.STMT(AST.While(x))
+%%
+
+%pos int
+%verbose
+%name CComp
+
+%start program
+
+%eop EOF 
+%noshift EOF
+
+%keyword QUESTION IF THEN ELSE FOR DO WHILE RETURN BREAK CONTINUE
+
+
+%term 
+ 	  EOF 
+	| COLON | SEMICOLON | LPAREN | RPAREN | LCURLY | RCURLY 
+	| QUESTION | PERCENT | DIVIDE | PLUS
+	| MINUS |  BANG | TIMES
+	| INC | DEC 
+	| ID of string  
+	| EQUALS 
+	| LTE | GTE | LT | GT | EQ | NEQ | OR | AND 
+	| DNUM of int
+	| RNUM of real
+	| NNUM of string 
+	| IF | THEN | ELSE
+	| FOR | DO 
+	| WHILE | RETURN 
+	| BREAK | CONTINUE
+	| CHAR | DOUBLE | FLOAT | INT | LONG | SHORT | STRING | VOID
+	| COMMA
+
+
+%nonterm 
+	 program of AST.declaration list
+	| sections of AST.declaration list
+	| funcsign of (AST.id * (AST.id list))
+	| funcproto of AST.declaration
+	| funcdef of AST.declaration
+	| func of AST.declaration
+	| var of AST.declaration
+	| declaration of AST.declaration
+	| ostatementlist of AST.statement list
+	| compoundStatement of AST.statement
+	| statement of AST.statement
+	| expr of AST.expression
+	| argumentExprList of AST.expression list
+	| typespec of AST.ctype
+	| argumentDeclList of AST.id list
+	| opexpr of AST.expression option
+
+%left COMMA
+%right EQUALS BANG
+%right QUESTION
+%left OR
+%left AND
+%left EQ NEQ
+%left LT GT LTE GTE
+%left PLUS MINUS
+%left TIMES DIVIDE PERCENT
+%right INC DEC 
+%left 	LPAREN
+%right IF
+%right ELSE
+%%
+
+program: 
+	sections   (sections)
+	| ([])
+
+sections: 
+		declaration		([declaration])
+	|	sections declaration  (sections@[declaration])
+
+funcsign:
+	  typespec ID LPAREN RPAREN     (createstruc(SOME (AST.Function(SOME typespec,[])),ID),[])	
+	| typespec ID LPAREN argumentDeclList RPAREN  (createstruc(SOME (AST.Function(SOME typespec,argumentDeclList)),ID),argumentDeclList) 
+
+funcproto:
+	funcsign SEMICOLON (AST.FuncDecl((#1 funcsign),(#2 funcsign),NONE))
+
+funcdef: 
+	funcsign LCURLY ostatementlist RCURLY (AST.FuncDecl((#1 funcsign),(#2 funcsign),SOME ostatementlist))
+
+func: 
+	  funcproto      (funcproto)
+	| funcdef        (funcdef)
+
+var:
+	  typespec ID SEMICOLON (AST.VarDecl(createstruc(SOME typespec,ID),NONE))
+	| VOID ID SEMICOLON (AST.VarDecl(createstruc(NONE,ID),NONE))
+	| VOID ID EQUALS expr SEMICOLON (AST.VarDecl(createstruc(NONE,ID),SOME expr)) 
+	| typespec ID EQUALS expr SEMICOLON (AST.VarDecl(createstruc(SOME typespec,ID),SOME expr)) 
+
+declaration:
+	  var (var) 
+	| func (func)
+	
+
+ostatementlist:	 
+	  	ostatementlist statement 		(ostatementlist@[statement])
+	| 							([])
+
+compoundStatement: 
+	 LCURLY sections ostatementlist RCURLY (AST.STMT(AST.Compound(sections,ostatementlist)))
+	| LCURLY ostatementlist RCURLY (AST.STMT(AST.Compound([],ostatementlist)))
+
+statement:
+	FOR LPAREN opexpr SEMICOLON opexpr SEMICOLON opexpr RPAREN statement (createfor(opexpr1,opexpr2,opexpr3,statement))
+					
+	| WHILE LPAREN expr RPAREN statement  (createwhile(expr,statement))
+					
+	| BREAK SEMICOLON		(AST.STMT(AST.Break))
+
+	| CONTINUE SEMICOLON		(AST.STMT(AST.Continue))
+
+	| RETURN opexpr SEMICOLON	(AST.STMT( AST.Return(opexpr) ))
+
+	| compoundStatement		(compoundStatement)
+					
+	| IF LPAREN expr RPAREN statement %prec IF (AST.STMT(AST.IfThen(expr,statement)))
+					
+	| IF LPAREN expr RPAREN statement ELSE statement %prec IF  (AST.STMT(AST.IfThenElse(expr,statement1,statement2)))
+
+	| expr SEMICOLON (AST.STMT(AST.Expr(expr)))
+					
+	| SEMICOLON		   (AST.STMT(AST.ErrorStmt))
+
+
+
+
+
+expr:
+	  expr QUESTION expr COLON expr SEMICOLON (createx(AST.QuestionColon(expr1,expr2,expr3)))
+
+	| expr OR expr ( createx(AST.Binop(AST.Or,expr1,expr2) ))
+
+	| expr LTE expr ( createx(AST.Binop(AST.Lte,expr1,expr2) ))
+
+	| expr GTE expr ( createx(AST.Binop(AST.Gte,expr1,expr2) ))
+
+	| expr LT expr ( createx(AST.Binop(AST.Lt,expr1,expr2) ))
+
+	| expr GT expr ( createx(AST.Binop(AST.Gt,expr1,expr2) ))
+
+	| expr EQ expr ( createx(AST.Binop(AST.Eq,expr1,expr2) ))
+
+	| expr NEQ expr ( createx(AST.Binop(AST.Neq,expr1,expr2) ))
+
+	| expr AND expr ( createx(AST.Binop(AST.And,expr1,expr2) ))
+
+	| expr EQUALS expr ( createx(AST.Assign(expr1, expr2) ))
+
+	| BANG expr ( createx(AST.Unop(AST.Not,expr) ))
+
+	| expr PLUS expr ( createx(AST.Binop(AST.Plus,expr1,expr2) ))
+ 
+	| expr MINUS expr ( createx(AST.Binop(AST.Minus,expr1,expr2) ))
+ 
+	| expr TIMES expr ( createx(AST.Binop(AST.Times,expr1,expr2) ))
+
+	| expr DIVIDE expr ( createx(AST.Binop(AST.Divide,expr1,expr2) ))
+
+	| expr PERCENT expr ( createx(AST.Binop(AST.Mod,expr1,expr2) ))
+
+	| expr INC %prec INC  (createx(AST.Unop(AST.PostInc,expr)))
+ 
+	| expr DEC %prec INC (createx(AST.Unop(AST.PostDec,expr)))
+
+	| INC expr %prec INC (createx(AST.Unop(AST.PreInc,expr)))
+
+	| DEC expr %prec INC (createx(AST.Unop(AST.PreDec,expr)))
+
+	| expr LPAREN RPAREN (createx(AST.Call(expr,[])))
+
+	| expr LPAREN argumentExprList RPAREN (createx(AST.Call(expr,argumentExprList)))
+
+	| NNUM (createx(AST.StringConst(NNUM)))
+
+	| DNUM (createx(AST.IntConst(DNUM)))
+
+	| RNUM (createx(AST.RealConst(RNUM)))
+
+	| ID ( createx(AST.Id(createstruc(NONE,ID)))) 
+
+opexpr:
+		(NONE)
+	| expr (SOME expr)
+
+argumentExprList:
+	  expr ([expr])
+	| argumentExprList COMMA expr (argumentExprList@[expr])
+
+argumentDeclList:
+		  typespec ID ([createstruc(SOME typespec,ID)])
+		|  argumentDeclList COMMA typespec ID (argumentDeclList@[createstruc(SOME typespec,ID)])
+typespec:
+	  CHAR       (AST.Numeric(AST.CHAR))
+	| DOUBLE     (AST.Numeric(AST.DOUBLE))
+	| FLOAT      (AST.Numeric(AST.FLOAT))
+	| INT        (AST.Numeric(AST.INT))
+	| LONG       (AST.Numeric(AST.LONG))
+	| SHORT      (AST.Numeric(AST.SHORT))
+	| STRING     (AST.NonNumeric)
