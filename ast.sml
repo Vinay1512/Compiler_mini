@@ -14,8 +14,8 @@ struct
 	    = Not  | PreInc | PostInc | PreDec | PostDec
 
 	datatype declaration
-    	= VarDecl of id * expression option
-    	| FuncDecl of id * id list * (statement list) option
+    	= VarDecl of id * (expression option)
+    	| FuncDecl of id * id list * (statement option)
 
     and statement = STMT of coreStatement 
 
