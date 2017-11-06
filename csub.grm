@@ -90,7 +90,7 @@ funcproto:
 	funcsign SEMICOLON (AST.FuncDecl((#1 funcsign),(#2 funcsign),NONE))
 
 funcdef: 
-	funcsign LCURLY ostatementlist RCURLY (AST.FuncDecl((#1 funcsign),(#2 funcsign),SOME ostatementlist))
+	funcsign compoundStatement (AST.FuncDecl((#1 funcsign),(#2 funcsign),SOME compoundStatement))
 
 func: 
 	  funcproto      (funcproto)
