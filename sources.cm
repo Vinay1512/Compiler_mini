@@ -4,6 +4,7 @@ ast.sml
 errormsg.sml
 csub.grm:MLYacc
 c.lex
+driver.sml
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
 $/basis.cm

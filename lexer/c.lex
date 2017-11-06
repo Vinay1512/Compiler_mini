@@ -1,14 +1,11 @@
 type pos = int
-
-type svalue        = Tokens.svalue
-type ('a,'b) token = ('a,'b) Tokens.token
-type lexresult     = (svalue,pos) token
+type lexresult = Tokens.token
 
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 fun err(pos1,pos2) = ErrorMsg.error pos1
 
-fun Eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
+fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 exception NotAnInt
 
@@ -17,9 +14,7 @@ fun getInt(optionInt : int option) = case optionInt of
   | _ => raise NotAnInt 
 
 %%
-%header (functor CCompLexFun(structure Tokens : CComp_TOKENS ));
-
-%s COMMENT;
+%s COMMENT ;
 letter = [a-zA-Z];
 digit = [0-9];
 id = {letter}({letter}|{digit}|_)*;
@@ -35,10 +30,10 @@ notQuote = [^"];
 <INITIAL>"for"      => (Tokens.FOR(yypos, yypos + size yytext));
 <INITIAL>"do"       => (Tokens.DO(yypos, yypos + size yytext));
 <INITIAL>"while"    => (Tokens.WHILE(yypos, yypos + size yytext));
-<INITAIL>"switch" 	=> (Tokens.SWITCH(yypos, yypos + size yytext));
+<INITIAL>"switch" 	=> (Tokens.SWITCH(yypos, yypos + size yytext));
 <INITIAL>"if"       => (Tokens.IF(yypos, yypos + size yytext));
 <INITIAL>"else"     => (Tokens.ELSE(yypos, yypos + size yytext));
-<INITIAL>"struct"	=> (TOKENS.STRUCT(yypos, yypos + size yytext));
+
 <INITIAL>"printf"	=> (Tokens.PRINT(yypos, yypos + size yytext));
 <INITIAL>"scanf" 	=> (Tokens.SCAN(yypos, yypos + size yytext));
 
@@ -68,7 +63,7 @@ notQuote = [^"];
 <INITIAL>":" => (Tokens.COLON(yypos, yypos + size yytext));
 
 <INITIAL>{id}                       => (Tokens.ID(yytext, yypos, yypos + size yytext));
-<INITIAL>{quote}{notQuote}*{quote} => (Tokens.STRING(yytext, yypos, yypos + size yytext));
+<INITIAL>{quote}{notQuote}*{quote} => (Tokens.STRING(String.extract(yytext,1,SOME ((size yytext) - 2)), yypos, yypos + size yytext));
 <INITIAL>{digit}+                   => (Tokens.INT(getInt (Int.fromString yytext), yypos, yypos + size yytext));
 
 <INITIAL>"/*"   => (YYBEGIN COMMENT; continue());

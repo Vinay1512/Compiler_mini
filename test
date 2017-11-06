@@ -1,0 +1,8 @@
+int xyz (int a , int b)
+{
+    for(i=1;;)
+    {
+        int a =  a == 5   ? 2 : 1;
+    }
+}
+int a = 5;

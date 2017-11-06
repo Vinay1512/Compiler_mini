@@ -61,7 +61,7 @@ fun createwhile x= AST.STMT(AST.While(x))
 
 %left COMMA
 %right EQUALS BANG
-%right QUESTION
+%right QUESTION 
 %left OR
 %left AND
 %left EQ NEQ
@@ -141,7 +141,7 @@ statement:
 
 
 expr:
-	  expr QUESTION expr COLON expr SEMICOLON (createx(AST.QuestionColon(expr1,expr2,expr3)))
+	  expr QUESTION expr COLON expr %prec QUESTION(createx(AST.QuestionColon(expr1,expr2,expr3)))
 
 	| expr OR expr ( createx(AST.Binop(AST.Or,expr1,expr2) ))
 
@@ -192,6 +192,8 @@ expr:
 	| RNUM (createx(AST.RealConst(RNUM)))
 
 	| ID ( createx(AST.Id(createstruc(NONE,ID)))) 
+	 
+	| LPAREN expr RPAREN (expr)
 
 opexpr:
 		(NONE)
