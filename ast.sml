@@ -1,4 +1,7 @@
-
+(*
+To Be Added:
+ Function prototypes now include only :: (int a,int b) and not (int,int)
+*)
 structure Abstract	  =
 struct
 
