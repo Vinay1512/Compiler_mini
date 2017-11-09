@@ -185,6 +185,8 @@ expr:
 
 	| expr LPAREN argumentExprList RPAREN (createx(AST.Call(expr,argumentExprList)))
 
+	| MINUS expr (createx(AST.Unop(AST.Negate,expr)))
+
 	| NNUM (createx(AST.StringConst(NNUM)))
 
 	| DNUM (createx(AST.IntConst(DNUM)))

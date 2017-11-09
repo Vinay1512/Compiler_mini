@@ -87,11 +87,12 @@ state 6:
 state 7:
 
 	funcproto : funcsign . SEMICOLON 
-	funcdef : funcsign . LCURLY ostatementlist RCURLY 
+	funcdef : funcsign . compoundStatement 
 
-	SEMICOLON	shift 19
-	LCURLY	shift 18
+	SEMICOLON	shift 20
+	LCURLY	shift 19
 
+	compoundStatement	goto 18
 
 	.	error
 
@@ -115,7 +116,7 @@ state 8:
 	funcdef	goto 5
 	func	goto 4
 	var	goto 3
-	declaration	goto 20
+	declaration	goto 21
 	typespec	goto 1
 
 	.	reduce by rule 0
@@ -126,7 +127,7 @@ state 9:
 	var : VOID . ID SEMICOLON 
 	var : VOID . ID EQUALS expr SEMICOLON 
 
-	ID	shift 21
+	ID	shift 22
 
 
 	.	error
@@ -134,65 +135,65 @@ state 9:
 
 state 10:
 
-	typespec : STRING .  (reduce by rule 69)
+	typespec : STRING .  (reduce by rule 70)
+
+
+
+	.	reduce by rule 70
+
+
+state 11:
+
+	typespec : SHORT .  (reduce by rule 69)
 
 
 
 	.	reduce by rule 69
 
 
-state 11:
+state 12:
 
-	typespec : SHORT .  (reduce by rule 68)
+	typespec : LONG .  (reduce by rule 68)
 
 
 
 	.	reduce by rule 68
 
 
-state 12:
+state 13:
 
-	typespec : LONG .  (reduce by rule 67)
+	typespec : INT .  (reduce by rule 67)
 
 
 
 	.	reduce by rule 67
 
 
-state 13:
+state 14:
 
-	typespec : INT .  (reduce by rule 66)
+	typespec : FLOAT .  (reduce by rule 66)
 
 
 
 	.	reduce by rule 66
 
 
-state 14:
+state 15:
 
-	typespec : FLOAT .  (reduce by rule 65)
+	typespec : DOUBLE .  (reduce by rule 65)
 
 
 
 	.	reduce by rule 65
 
 
-state 15:
+state 16:
 
-	typespec : DOUBLE .  (reduce by rule 64)
+	typespec : CHAR .  (reduce by rule 64)
 
 
 
 	.	reduce by rule 64
-
-
-state 16:
-
-	typespec : CHAR .  (reduce by rule 63)
-
-
-
-	.	reduce by rule 63
 
 
 state 17:
@@ -202,9 +203,9 @@ state 17:
 	var : typespec ID . SEMICOLON 
 	var : typespec ID . EQUALS expr SEMICOLON 
 
-	SEMICOLON	shift 24
-	LPAREN	shift 23
-	EQUALS	shift 22
+	SEMICOLON	shift 25
+	LPAREN	shift 24
+	EQUALS	shift 23
 
 
 	.	error
@@ -212,15 +213,41 @@ state 17:
 
 state 18:
 
-	funcdef : funcsign LCURLY . ostatementlist RCURLY 
+	funcdef : funcsign compoundStatement .  (reduce by rule 7)
 
 
-	ostatementlist	goto 25
+
+	.	reduce by rule 7
+
+
+state 19:
+
+	compoundStatement : LCURLY . sections ostatementlist RCURLY 
+	compoundStatement : LCURLY . ostatementlist RCURLY 
+
+	CHAR	shift 16
+	DOUBLE	shift 15
+	FLOAT	shift 14
+	INT	shift 13
+	LONG	shift 12
+	SHORT	shift 11
+	STRING	shift 10
+	VOID	shift 9
+
+	sections	goto 27
+	funcsign	goto 7
+	funcproto	goto 6
+	funcdef	goto 5
+	func	goto 4
+	var	goto 3
+	declaration	goto 2
+	ostatementlist	goto 26
+	typespec	goto 1
 
 	.	reduce by rule 17
 
 
-state 19:
+state 20:
 
 	funcproto : funcsign SEMICOLON .  (reduce by rule 6)
 
@@ -229,7 +256,7 @@ state 19:
 	.	reduce by rule 6
 
 
-state 20:
+state 21:
 
 	sections : sections declaration .  (reduce by rule 3)
 
@@ -238,42 +265,43 @@ state 20:
 	.	reduce by rule 3
 
 
-state 21:
+state 22:
 
 	var : VOID ID . SEMICOLON 
 	var : VOID ID . EQUALS expr SEMICOLON 
 
-	SEMICOLON	shift 27
-	EQUALS	shift 26
+	SEMICOLON	shift 29
+	EQUALS	shift 28
 
-
-	.	error
-
-
-state 22:
-
-	var : typespec ID EQUALS . expr SEMICOLON 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 28
 
 	.	error
 
 
 state 23:
 
+	var : typespec ID EQUALS . expr SEMICOLON 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 30
+
+	.	error
+
+
+state 24:
+
 	funcsign : typespec ID LPAREN . RPAREN 
 	funcsign : typespec ID LPAREN . argumentDeclList RPAREN 
 
-	RPAREN	shift 39
+	RPAREN	shift 42
 	CHAR	shift 16
 	DOUBLE	shift 15
 	FLOAT	shift 14
@@ -282,13 +310,13 @@ state 23:
 	SHORT	shift 11
 	STRING	shift 10
 
-	typespec	goto 38
-	argumentDeclList	goto 37
+	typespec	goto 41
+	argumentDeclList	goto 40
 
 	.	error
 
 
-state 24:
+state 25:
 
 	var : typespec ID SEMICOLON .  (reduce by rule 10)
 
@@ -297,55 +325,83 @@ state 24:
 	.	reduce by rule 10
 
 
-state 25:
-
-	funcdef : funcsign LCURLY ostatementlist . RCURLY 
-	ostatementlist : ostatementlist . statement 
-
-	SEMICOLON	shift 51
-	LPAREN	shift 36
-	LCURLY	shift 50
-	RCURLY	shift 49
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-	IF	shift 48
-	FOR	shift 47
-	WHILE	shift 46
-	RETURN	shift 45
-	BREAK	shift 44
-	CONTINUE	shift 43
-
-	compoundStatement	goto 42
-	statement	goto 41
-	expr	goto 40
-
-	.	error
-
-
 state 26:
 
-	var : VOID ID EQUALS . expr SEMICOLON 
+	ostatementlist : ostatementlist . statement 
+	compoundStatement : LCURLY ostatementlist . RCURLY 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	SEMICOLON	shift 53
+	LPAREN	shift 39
+	LCURLY	shift 19
+	RCURLY	shift 52
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+	IF	shift 51
+	FOR	shift 50
+	WHILE	shift 49
+	RETURN	shift 48
+	BREAK	shift 47
+	CONTINUE	shift 46
 
-	expr	goto 52
+	compoundStatement	goto 45
+	statement	goto 44
+	expr	goto 43
 
 	.	error
 
 
 state 27:
+
+	sections : sections . declaration 
+	compoundStatement : LCURLY sections . ostatementlist RCURLY 
+
+	CHAR	shift 16
+	DOUBLE	shift 15
+	FLOAT	shift 14
+	INT	shift 13
+	LONG	shift 12
+	SHORT	shift 11
+	STRING	shift 10
+	VOID	shift 9
+
+	funcsign	goto 7
+	funcproto	goto 6
+	funcdef	goto 5
+	func	goto 4
+	var	goto 3
+	declaration	goto 21
+	ostatementlist	goto 54
+	typespec	goto 1
+
+	.	reduce by rule 17
+
+
+state 28:
+
+	var : VOID ID EQUALS . expr SEMICOLON 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 55
+
+	.	error
+
+
+state 29:
 
 	var : VOID ID SEMICOLON .  (reduce by rule 11)
 
@@ -354,7 +410,7 @@ state 27:
 	.	reduce by rule 11
 
 
-state 28:
+state 30:
 
 	var : typespec ID EQUALS expr . SEMICOLON 
 	expr : expr . QUESTION expr COLON expr 
@@ -377,51 +433,33 @@ state 28:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	SEMICOLON	shift 71
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	SEMICOLON	shift 74
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	error
 
 
-state 29:
-
-	expr : NNUM .  (reduce by rule 52)
-
-
-
-	.	reduce by rule 52
-
-
-state 30:
-
-	expr : RNUM .  (reduce by rule 54)
-
-
-
-	.	reduce by rule 54
-
-
 state 31:
 
-	expr : DNUM .  (reduce by rule 53)
+	expr : NNUM .  (reduce by rule 53)
 
 
 
@@ -430,7 +468,7 @@ state 31:
 
 state 32:
 
-	expr : ID .  (reduce by rule 55)
+	expr : RNUM .  (reduce by rule 55)
 
 
 
@@ -439,99 +477,140 @@ state 32:
 
 state 33:
 
-	expr : DEC . expr 
+	expr : DNUM .  (reduce by rule 54)
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
 
-	expr	goto 72
 
-	.	error
+	.	reduce by rule 54
 
 
 state 34:
 
-	expr : INC . expr 
+	expr : ID .  (reduce by rule 56)
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
 
-	expr	goto 73
 
-	.	error
+	.	reduce by rule 56
 
 
 state 35:
 
-	expr : BANG . expr 
+	expr : DEC . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 74
-
-	.	error
-
-
-state 36:
-
-	expr : LPAREN . expr RPAREN 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 75
 
 	.	error
 
 
+state 36:
+
+	expr : INC . expr 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 76
+
+	.	error
+
+
 state 37:
 
-	funcsign : typespec ID LPAREN argumentDeclList . RPAREN 
-	argumentDeclList : argumentDeclList . COMMA typespec ID 
+	expr : BANG . expr 
 
-	RPAREN	shift 77
-	COMMA	shift 76
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
+	expr	goto 77
 
 	.	error
 
 
 state 38:
 
-	argumentDeclList : typespec . ID 
+	expr : MINUS . expr 
 
-	ID	shift 78
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
+	expr	goto 78
 
 	.	error
 
 
 state 39:
+
+	expr : LPAREN . expr RPAREN 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 79
+
+	.	error
+
+
+state 40:
+
+	funcsign : typespec ID LPAREN argumentDeclList . RPAREN 
+	argumentDeclList : argumentDeclList . COMMA typespec ID 
+
+	RPAREN	shift 81
+	COMMA	shift 80
+
+
+	.	error
+
+
+state 41:
+
+	argumentDeclList : typespec . ID 
+
+	ID	shift 82
+
+
+	.	error
+
+
+state 42:
 
 	funcsign : typespec ID LPAREN RPAREN .  (reduce by rule 4)
 
@@ -540,7 +619,7 @@ state 39:
 	.	reduce by rule 4
 
 
-state 40:
+state 43:
 
 	statement : expr . SEMICOLON 
 	expr : expr . QUESTION expr COLON expr 
@@ -563,31 +642,31 @@ state 40:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	SEMICOLON	shift 79
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	SEMICOLON	shift 83
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	error
 
 
-state 41:
+state 44:
 
 	ostatementlist : ostatementlist statement .  (reduce by rule 16)
 
@@ -596,7 +675,7 @@ state 41:
 	.	reduce by rule 16
 
 
-state 42:
+state 45:
 
 	statement : compoundStatement .  (reduce by rule 25)
 
@@ -605,50 +684,11 @@ state 42:
 	.	reduce by rule 25
 
 
-state 43:
+state 46:
 
 	statement : CONTINUE . SEMICOLON 
 
-	SEMICOLON	shift 80
-
-
-	.	error
-
-
-state 44:
-
-	statement : BREAK . SEMICOLON 
-
-	SEMICOLON	shift 81
-
-
-	.	error
-
-
-state 45:
-
-	statement : RETURN . opexpr SEMICOLON 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 83
-	opexpr	goto 82
-
-	.	reduce by rule 57
-
-
-state 46:
-
-	statement : WHILE . LPAREN expr RPAREN statement 
-
-	LPAREN	shift 84
+	SEMICOLON	shift 84
 
 
 	.	error
@@ -656,9 +696,9 @@ state 46:
 
 state 47:
 
-	statement : FOR . LPAREN opexpr SEMICOLON opexpr SEMICOLON opexpr RPAREN statement 
+	statement : BREAK . SEMICOLON 
 
-	LPAREN	shift 85
+	SEMICOLON	shift 85
 
 
 	.	error
@@ -666,52 +706,65 @@ state 47:
 
 state 48:
 
-	statement : IF . LPAREN expr RPAREN statement 
-	statement : IF . LPAREN expr RPAREN statement ELSE statement 
+	statement : RETURN . opexpr SEMICOLON 
 
-	LPAREN	shift 86
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 87
+	opexpr	goto 86
+
+	.	reduce by rule 58
+
+
+state 49:
+
+	statement : WHILE . LPAREN expr RPAREN statement 
+
+	LPAREN	shift 88
 
 
 	.	error
 
 
-state 49:
-
-	funcdef : funcsign LCURLY ostatementlist RCURLY .  (reduce by rule 7)
-
-
-
-	.	reduce by rule 7
-
-
 state 50:
 
-	compoundStatement : LCURLY . sections ostatementlist RCURLY 
-	compoundStatement : LCURLY . ostatementlist RCURLY 
+	statement : FOR . LPAREN opexpr SEMICOLON opexpr SEMICOLON opexpr RPAREN statement 
 
-	CHAR	shift 16
-	DOUBLE	shift 15
-	FLOAT	shift 14
-	INT	shift 13
-	LONG	shift 12
-	SHORT	shift 11
-	STRING	shift 10
-	VOID	shift 9
+	LPAREN	shift 89
 
-	sections	goto 88
-	funcsign	goto 7
-	funcproto	goto 6
-	funcdef	goto 5
-	func	goto 4
-	var	goto 3
-	declaration	goto 2
-	ostatementlist	goto 87
-	typespec	goto 1
 
-	.	reduce by rule 17
+	.	error
 
 
 state 51:
+
+	statement : IF . LPAREN expr RPAREN statement 
+	statement : IF . LPAREN expr RPAREN statement ELSE statement 
+
+	LPAREN	shift 90
+
+
+	.	error
+
+
+state 52:
+
+	compoundStatement : LCURLY ostatementlist RCURLY .  (reduce by rule 19)
+
+
+
+	.	reduce by rule 19
+
+
+state 53:
 
 	statement : SEMICOLON .  (reduce by rule 29)
 
@@ -720,7 +773,38 @@ state 51:
 	.	reduce by rule 29
 
 
-state 52:
+state 54:
+
+	ostatementlist : ostatementlist . statement 
+	compoundStatement : LCURLY sections ostatementlist . RCURLY 
+
+	SEMICOLON	shift 53
+	LPAREN	shift 39
+	LCURLY	shift 19
+	RCURLY	shift 91
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+	IF	shift 51
+	FOR	shift 50
+	WHILE	shift 49
+	RETURN	shift 48
+	BREAK	shift 47
+	CONTINUE	shift 46
+
+	compoundStatement	goto 45
+	statement	goto 44
+	expr	goto 43
+
+	.	error
+
+
+state 55:
 
 	var : VOID ID EQUALS expr . SEMICOLON 
 	expr : expr . QUESTION expr COLON expr 
@@ -743,96 +827,43 @@ state 52:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	SEMICOLON	shift 89
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	SEMICOLON	shift 92
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
-
-	.	error
-
-
-state 53:
-
-	expr : expr AND . expr 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 90
-
-	.	error
-
-
-state 54:
-
-	expr : expr OR . expr 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 91
-
-	.	error
-
-
-state 55:
-
-	expr : expr NEQ . expr 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 92
 
 	.	error
 
 
 state 56:
 
-	expr : expr EQ . expr 
+	expr : expr AND . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 93
 
@@ -841,16 +872,17 @@ state 56:
 
 state 57:
 
-	expr : expr GT . expr 
+	expr : expr OR . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 94
 
@@ -859,16 +891,17 @@ state 57:
 
 state 58:
 
-	expr : expr LT . expr 
+	expr : expr NEQ . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 95
 
@@ -877,16 +910,17 @@ state 58:
 
 state 59:
 
-	expr : expr GTE . expr 
+	expr : expr EQ . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 96
 
@@ -895,16 +929,17 @@ state 59:
 
 state 60:
 
-	expr : expr LTE . expr 
+	expr : expr GT . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 97
 
@@ -913,16 +948,17 @@ state 60:
 
 state 61:
 
-	expr : expr EQUALS . expr 
+	expr : expr LT . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 98
 
@@ -931,6 +967,63 @@ state 61:
 
 state 62:
 
+	expr : expr GTE . expr 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 99
+
+	.	error
+
+
+state 63:
+
+	expr : expr LTE . expr 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 100
+
+	.	error
+
+
+state 64:
+
+	expr : expr EQUALS . expr 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 101
+
+	.	error
+
+
+state 65:
+
 	expr : expr DEC .  (reduce by rule 47)
 
 
@@ -938,7 +1031,7 @@ state 62:
 	.	reduce by rule 47
 
 
-state 63:
+state 66:
 
 	expr : expr INC .  (reduce by rule 46)
 
@@ -947,72 +1040,19 @@ state 63:
 	.	reduce by rule 46
 
 
-state 64:
+state 67:
 
 	expr : expr TIMES . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 99
-
-	.	error
-
-
-state 65:
-
-	expr : expr MINUS . expr 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 100
-
-	.	error
-
-
-state 66:
-
-	expr : expr PLUS . expr 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 101
-
-	.	error
-
-
-state 67:
-
-	expr : expr DIVIDE . expr 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 102
 
@@ -1021,16 +1061,17 @@ state 67:
 
 state 68:
 
-	expr : expr PERCENT . expr 
+	expr : expr MINUS . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 103
 
@@ -1039,16 +1080,17 @@ state 68:
 
 state 69:
 
-	expr : expr QUESTION . expr COLON expr 
+	expr : expr PLUS . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 104
 
@@ -1057,26 +1099,84 @@ state 69:
 
 state 70:
 
-	expr : expr LPAREN . RPAREN 
-	expr : expr LPAREN . argumentExprList RPAREN 
+	expr : expr DIVIDE . expr 
 
-	LPAREN	shift 36
-	RPAREN	shift 107
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
-	expr	goto 106
-	argumentExprList	goto 105
+	expr	goto 105
 
 	.	error
 
 
 state 71:
+
+	expr : expr PERCENT . expr 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 106
+
+	.	error
+
+
+state 72:
+
+	expr : expr QUESTION . expr COLON expr 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 107
+
+	.	error
+
+
+state 73:
+
+	expr : expr LPAREN . RPAREN 
+	expr : expr LPAREN . argumentExprList RPAREN 
+
+	LPAREN	shift 39
+	RPAREN	shift 110
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 109
+	argumentExprList	goto 108
+
+	.	error
+
+
+state 74:
 
 	var : typespec ID EQUALS expr SEMICOLON .  (reduce by rule 13)
 
@@ -1085,7 +1185,7 @@ state 71:
 	.	reduce by rule 13
 
 
-state 72:
+state 75:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1108,15 +1208,15 @@ state 72:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 49
 
 
-state 73:
+state 76:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1139,15 +1239,15 @@ state 73:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 48
 
 
-state 74:
+state 77:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1170,30 +1270,64 @@ state 74:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	reduce by rule 40
 
 
-state 75:
+state 78:
+
+	expr : expr . QUESTION expr COLON expr 
+	expr : expr . OR expr 
+	expr : expr . LTE expr 
+	expr : expr . GTE expr 
+	expr : expr . LT expr 
+	expr : expr . GT expr 
+	expr : expr . EQ expr 
+	expr : expr . NEQ expr 
+	expr : expr . AND expr 
+	expr : expr . EQUALS expr 
+	expr : expr . PLUS expr 
+	expr : expr . MINUS expr 
+	expr : expr . TIMES expr 
+	expr : expr . DIVIDE expr 
+	expr : expr . PERCENT expr 
+	expr : expr . INC 
+	expr : expr . DEC 
+	expr : expr . LPAREN RPAREN 
+	expr : expr . LPAREN argumentExprList RPAREN 
+	expr : MINUS expr .  (reduce by rule 52)
+
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+
+
+	.	reduce by rule 52
+
+
+state 79:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1216,31 +1350,31 @@ state 75:
 	expr : expr . LPAREN argumentExprList RPAREN 
 	expr : LPAREN expr . RPAREN 
 
-	LPAREN	shift 70
-	RPAREN	shift 108
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	LPAREN	shift 73
+	RPAREN	shift 111
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	error
 
 
-state 76:
+state 80:
 
 	argumentDeclList : argumentDeclList COMMA . typespec ID 
 
@@ -1252,12 +1386,12 @@ state 76:
 	SHORT	shift 11
 	STRING	shift 10
 
-	typespec	goto 109
+	typespec	goto 112
 
 	.	error
 
 
-state 77:
+state 81:
 
 	funcsign : typespec ID LPAREN argumentDeclList RPAREN .  (reduce by rule 5)
 
@@ -1266,16 +1400,16 @@ state 77:
 	.	reduce by rule 5
 
 
-state 78:
+state 82:
 
-	argumentDeclList : typespec ID .  (reduce by rule 61)
-
-
-
-	.	reduce by rule 61
+	argumentDeclList : typespec ID .  (reduce by rule 62)
 
 
-state 79:
+
+	.	reduce by rule 62
+
+
+state 83:
 
 	statement : expr SEMICOLON .  (reduce by rule 28)
 
@@ -1284,7 +1418,7 @@ state 79:
 	.	reduce by rule 28
 
 
-state 80:
+state 84:
 
 	statement : CONTINUE SEMICOLON .  (reduce by rule 23)
 
@@ -1293,7 +1427,7 @@ state 80:
 	.	reduce by rule 23
 
 
-state 81:
+state 85:
 
 	statement : BREAK SEMICOLON .  (reduce by rule 22)
 
@@ -1302,17 +1436,17 @@ state 81:
 	.	reduce by rule 22
 
 
-state 82:
+state 86:
 
 	statement : RETURN opexpr . SEMICOLON 
 
-	SEMICOLON	shift 110
+	SEMICOLON	shift 113
 
 
 	.	error
 
 
-state 83:
+state 87:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1333,144 +1467,100 @@ state 83:
 	expr : expr . DEC 
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
-	opexpr : expr .  (reduce by rule 58)
+	opexpr : expr .  (reduce by rule 59)
 
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
-
-
-	.	reduce by rule 58
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
-state 84:
-
-	statement : WHILE LPAREN . expr RPAREN statement 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 111
-
-	.	error
-
-
-state 85:
-
-	statement : FOR LPAREN . opexpr SEMICOLON opexpr SEMICOLON opexpr RPAREN statement 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 83
-	opexpr	goto 112
-
-	.	reduce by rule 57
-
-
-state 86:
-
-	statement : IF LPAREN . expr RPAREN statement 
-	statement : IF LPAREN . expr RPAREN statement ELSE statement 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 113
-
-	.	error
-
-
-state 87:
-
-	ostatementlist : ostatementlist . statement 
-	compoundStatement : LCURLY ostatementlist . RCURLY 
-
-	SEMICOLON	shift 51
-	LPAREN	shift 36
-	LCURLY	shift 50
-	RCURLY	shift 114
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-	IF	shift 48
-	FOR	shift 47
-	WHILE	shift 46
-	RETURN	shift 45
-	BREAK	shift 44
-	CONTINUE	shift 43
-
-	compoundStatement	goto 42
-	statement	goto 41
-	expr	goto 40
-
-	.	error
+	.	reduce by rule 59
 
 
 state 88:
 
-	sections : sections . declaration 
-	compoundStatement : LCURLY sections . ostatementlist RCURLY 
+	statement : WHILE LPAREN . expr RPAREN statement 
 
-	CHAR	shift 16
-	DOUBLE	shift 15
-	FLOAT	shift 14
-	INT	shift 13
-	LONG	shift 12
-	SHORT	shift 11
-	STRING	shift 10
-	VOID	shift 9
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
-	funcsign	goto 7
-	funcproto	goto 6
-	funcdef	goto 5
-	func	goto 4
-	var	goto 3
-	declaration	goto 20
-	ostatementlist	goto 115
-	typespec	goto 1
+	expr	goto 114
 
-	.	reduce by rule 17
+	.	error
 
 
 state 89:
+
+	statement : FOR LPAREN . opexpr SEMICOLON opexpr SEMICOLON opexpr RPAREN statement 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 87
+	opexpr	goto 115
+
+	.	reduce by rule 58
+
+
+state 90:
+
+	statement : IF LPAREN . expr RPAREN statement 
+	statement : IF LPAREN . expr RPAREN statement ELSE statement 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 116
+
+	.	error
+
+
+state 91:
+
+	compoundStatement : LCURLY sections ostatementlist RCURLY .  (reduce by rule 18)
+
+
+
+	.	reduce by rule 18
+
+
+state 92:
 
 	var : VOID ID EQUALS expr SEMICOLON .  (reduce by rule 12)
 
@@ -1479,7 +1569,7 @@ state 89:
 	.	reduce by rule 12
 
 
-state 90:
+state 93:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1502,26 +1592,26 @@ state 90:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
 
 
 	.	reduce by rule 38
 
 
-state 91:
+state 94:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1544,27 +1634,27 @@ state 91:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	AND	shift 53
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	AND	shift 56
 
 
 	.	reduce by rule 31
 
 
-state 92:
+state 95:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1587,24 +1677,24 @@ state 92:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
 
 
 	.	reduce by rule 37
 
 
-state 93:
+state 96:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1627,24 +1717,24 @@ state 93:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
 
 
 	.	reduce by rule 36
 
 
-state 94:
+state 97:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1667,20 +1757,20 @@ state 94:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 35
 
 
-state 95:
+state 98:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1703,20 +1793,20 @@ state 95:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 34
 
 
-state 96:
+state 99:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1739,20 +1829,20 @@ state 96:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 33
 
 
-state 97:
+state 100:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1775,20 +1865,20 @@ state 97:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 32
 
 
-state 98:
+state 101:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1811,30 +1901,30 @@ state 98:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	reduce by rule 39
 
 
-state 99:
+state 102:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1857,15 +1947,15 @@ state 99:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 43
 
 
-state 100:
+state 103:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1888,18 +1978,18 @@ state 100:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 42
 
 
-state 101:
+state 104:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1922,18 +2012,18 @@ state 101:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 41
 
 
-state 102:
+state 105:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1956,15 +2046,15 @@ state 102:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 44
 
 
-state 103:
+state 106:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -1987,15 +2077,15 @@ state 103:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	INC	shift 63
-	DEC	shift 62
+	LPAREN	shift 73
+	INC	shift 66
+	DEC	shift 65
 
 
 	.	reduce by rule 45
 
 
-state 104:
+state 107:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr QUESTION expr . COLON expr 
@@ -2018,43 +2108,43 @@ state 104:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	COLON	shift 116
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	COLON	shift 117
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	error
 
 
-state 105:
+state 108:
 
 	expr : expr LPAREN argumentExprList . RPAREN 
 	argumentExprList : argumentExprList . COMMA expr 
 
-	RPAREN	shift 118
-	COMMA	shift 117
+	RPAREN	shift 119
+	COMMA	shift 118
 
 
 	.	error
 
 
-state 106:
+state 109:
 
 	expr : expr . QUESTION expr COLON expr 
 	expr : expr . OR expr 
@@ -2075,32 +2165,32 @@ state 106:
 	expr : expr . DEC 
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
-	argumentExprList : expr .  (reduce by rule 59)
+	argumentExprList : expr .  (reduce by rule 60)
 
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
-
-
-	.	reduce by rule 59
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
-state 107:
+	.	reduce by rule 60
+
+
+state 110:
 
 	expr : expr LPAREN RPAREN .  (reduce by rule 50)
 
@@ -2109,26 +2199,26 @@ state 107:
 	.	reduce by rule 50
 
 
-state 108:
+state 111:
 
-	expr : LPAREN expr RPAREN .  (reduce by rule 56)
-
-
-
-	.	reduce by rule 56
+	expr : LPAREN expr RPAREN .  (reduce by rule 57)
 
 
-state 109:
+
+	.	reduce by rule 57
+
+
+state 112:
 
 	argumentDeclList : argumentDeclList COMMA typespec . ID 
 
-	ID	shift 119
+	ID	shift 120
 
 
 	.	error
 
 
-state 110:
+state 113:
 
 	statement : RETURN opexpr SEMICOLON .  (reduce by rule 24)
 
@@ -2137,7 +2227,7 @@ state 110:
 	.	reduce by rule 24
 
 
-state 111:
+state 114:
 
 	statement : WHILE LPAREN expr . RPAREN statement 
 	expr : expr . QUESTION expr COLON expr 
@@ -2160,41 +2250,41 @@ state 111:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	RPAREN	shift 120
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	LPAREN	shift 73
+	RPAREN	shift 121
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	error
 
 
-state 112:
+state 115:
 
 	statement : FOR LPAREN opexpr . SEMICOLON opexpr SEMICOLON opexpr RPAREN statement 
 
-	SEMICOLON	shift 121
+	SEMICOLON	shift 122
 
 
 	.	error
 
 
-state 113:
+state 116:
 
 	statement : IF LPAREN expr . RPAREN statement 
 	statement : IF LPAREN expr . RPAREN statement ELSE statement 
@@ -2218,106 +2308,69 @@ state 113:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	RPAREN	shift 122
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	LPAREN	shift 73
+	RPAREN	shift 123
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
-
-	.	error
-
-
-state 114:
-
-	compoundStatement : LCURLY ostatementlist RCURLY .  (reduce by rule 19)
-
-
-
-	.	reduce by rule 19
-
-
-state 115:
-
-	ostatementlist : ostatementlist . statement 
-	compoundStatement : LCURLY sections ostatementlist . RCURLY 
-
-	SEMICOLON	shift 51
-	LPAREN	shift 36
-	LCURLY	shift 50
-	RCURLY	shift 123
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-	IF	shift 48
-	FOR	shift 47
-	WHILE	shift 46
-	RETURN	shift 45
-	BREAK	shift 44
-	CONTINUE	shift 43
-
-	compoundStatement	goto 42
-	statement	goto 41
-	expr	goto 40
-
-	.	error
-
-
-state 116:
-
-	expr : expr QUESTION expr COLON . expr 
-
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-
-	expr	goto 124
 
 	.	error
 
 
 state 117:
 
+	expr : expr QUESTION expr COLON . expr 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 124
+
+	.	error
+
+
+state 118:
+
 	argumentExprList : argumentExprList COMMA . expr 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
 	expr	goto 125
 
 	.	error
 
 
-state 118:
+state 119:
 
 	expr : expr LPAREN argumentExprList RPAREN .  (reduce by rule 51)
 
@@ -2326,98 +2379,92 @@ state 118:
 	.	reduce by rule 51
 
 
-state 119:
-
-	argumentDeclList : argumentDeclList COMMA typespec ID .  (reduce by rule 62)
-
-
-
-	.	reduce by rule 62
-
-
 state 120:
 
-	statement : WHILE LPAREN expr RPAREN . statement 
+	argumentDeclList : argumentDeclList COMMA typespec ID .  (reduce by rule 63)
 
-	SEMICOLON	shift 51
-	LPAREN	shift 36
-	LCURLY	shift 50
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-	IF	shift 48
-	FOR	shift 47
-	WHILE	shift 46
-	RETURN	shift 45
-	BREAK	shift 44
-	CONTINUE	shift 43
 
-	compoundStatement	goto 42
-	statement	goto 126
-	expr	goto 40
 
-	.	error
+	.	reduce by rule 63
 
 
 state 121:
 
-	statement : FOR LPAREN opexpr SEMICOLON . opexpr SEMICOLON opexpr RPAREN statement 
+	statement : WHILE LPAREN expr RPAREN . statement 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	SEMICOLON	shift 53
+	LPAREN	shift 39
+	LCURLY	shift 19
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+	IF	shift 51
+	FOR	shift 50
+	WHILE	shift 49
+	RETURN	shift 48
+	BREAK	shift 47
+	CONTINUE	shift 46
 
-	expr	goto 83
-	opexpr	goto 127
-
-	.	reduce by rule 57
-
-
-state 122:
-
-	statement : IF LPAREN expr RPAREN . statement 
-	statement : IF LPAREN expr RPAREN . statement ELSE statement 
-
-	SEMICOLON	shift 51
-	LPAREN	shift 36
-	LCURLY	shift 50
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-	IF	shift 48
-	FOR	shift 47
-	WHILE	shift 46
-	RETURN	shift 45
-	BREAK	shift 44
-	CONTINUE	shift 43
-
-	compoundStatement	goto 42
-	statement	goto 128
-	expr	goto 40
+	compoundStatement	goto 45
+	statement	goto 126
+	expr	goto 43
 
 	.	error
 
 
+state 122:
+
+	statement : FOR LPAREN opexpr SEMICOLON . opexpr SEMICOLON opexpr RPAREN statement 
+
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+
+	expr	goto 87
+	opexpr	goto 127
+
+	.	reduce by rule 58
+
+
 state 123:
 
-	compoundStatement : LCURLY sections ostatementlist RCURLY .  (reduce by rule 18)
+	statement : IF LPAREN expr RPAREN . statement 
+	statement : IF LPAREN expr RPAREN . statement ELSE statement 
 
+	SEMICOLON	shift 53
+	LPAREN	shift 39
+	LCURLY	shift 19
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+	IF	shift 51
+	FOR	shift 50
+	WHILE	shift 49
+	RETURN	shift 48
+	BREAK	shift 47
+	CONTINUE	shift 46
 
+	compoundStatement	goto 45
+	statement	goto 128
+	expr	goto 43
 
-	.	reduce by rule 18
+	.	error
 
 
 state 124:
@@ -2443,23 +2490,23 @@ state 124:
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
 
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
 	.	reduce by rule 30
@@ -2486,29 +2533,29 @@ state 125:
 	expr : expr . DEC 
 	expr : expr . LPAREN RPAREN 
 	expr : expr . LPAREN argumentExprList RPAREN 
-	argumentExprList : argumentExprList COMMA expr .  (reduce by rule 60)
+	argumentExprList : argumentExprList COMMA expr .  (reduce by rule 61)
 
-	LPAREN	shift 70
-	QUESTION	shift 69
-	PERCENT	shift 68
-	DIVIDE	shift 67
-	PLUS	shift 66
-	MINUS	shift 65
-	TIMES	shift 64
-	INC	shift 63
-	DEC	shift 62
-	EQUALS	shift 61
-	LTE	shift 60
-	GTE	shift 59
-	LT	shift 58
-	GT	shift 57
-	EQ	shift 56
-	NEQ	shift 55
-	OR	shift 54
-	AND	shift 53
+	LPAREN	shift 73
+	QUESTION	shift 72
+	PERCENT	shift 71
+	DIVIDE	shift 70
+	PLUS	shift 69
+	MINUS	shift 68
+	TIMES	shift 67
+	INC	shift 66
+	DEC	shift 65
+	EQUALS	shift 64
+	LTE	shift 63
+	GTE	shift 62
+	LT	shift 61
+	GT	shift 60
+	EQ	shift 59
+	NEQ	shift 58
+	OR	shift 57
+	AND	shift 56
 
 
-	.	reduce by rule 60
+	.	reduce by rule 61
 
 
 state 126:
@@ -2545,45 +2592,47 @@ state 129:
 
 	statement : FOR LPAREN opexpr SEMICOLON opexpr SEMICOLON . opexpr RPAREN statement 
 
-	LPAREN	shift 36
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
+	LPAREN	shift 39
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
 
-	expr	goto 83
+	expr	goto 87
 	opexpr	goto 131
 
-	.	reduce by rule 57
+	.	reduce by rule 58
 
 
 state 130:
 
 	statement : IF LPAREN expr RPAREN statement ELSE . statement 
 
-	SEMICOLON	shift 51
-	LPAREN	shift 36
-	LCURLY	shift 50
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-	IF	shift 48
-	FOR	shift 47
-	WHILE	shift 46
-	RETURN	shift 45
-	BREAK	shift 44
-	CONTINUE	shift 43
+	SEMICOLON	shift 53
+	LPAREN	shift 39
+	LCURLY	shift 19
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+	IF	shift 51
+	FOR	shift 50
+	WHILE	shift 49
+	RETURN	shift 48
+	BREAK	shift 47
+	CONTINUE	shift 46
 
-	compoundStatement	goto 42
+	compoundStatement	goto 45
 	statement	goto 132
-	expr	goto 40
+	expr	goto 43
 
 	.	error
 
@@ -2611,26 +2660,27 @@ state 133:
 
 	statement : FOR LPAREN opexpr SEMICOLON opexpr SEMICOLON opexpr RPAREN . statement 
 
-	SEMICOLON	shift 51
-	LPAREN	shift 36
-	LCURLY	shift 50
-	BANG	shift 35
-	INC	shift 34
-	DEC	shift 33
-	ID	shift 32
-	DNUM	shift 31
-	RNUM	shift 30
-	NNUM	shift 29
-	IF	shift 48
-	FOR	shift 47
-	WHILE	shift 46
-	RETURN	shift 45
-	BREAK	shift 44
-	CONTINUE	shift 43
+	SEMICOLON	shift 53
+	LPAREN	shift 39
+	LCURLY	shift 19
+	MINUS	shift 38
+	BANG	shift 37
+	INC	shift 36
+	DEC	shift 35
+	ID	shift 34
+	DNUM	shift 33
+	RNUM	shift 32
+	NNUM	shift 31
+	IF	shift 51
+	FOR	shift 50
+	WHILE	shift 49
+	RETURN	shift 48
+	BREAK	shift 47
+	CONTINUE	shift 46
 
-	compoundStatement	goto 42
+	compoundStatement	goto 45
 	statement	goto 134
-	expr	goto 40
+	expr	goto 43
 
 	.	error
 
@@ -2652,5 +2702,5 @@ state 135:
 
 	.	error
 
-509 of 917 action table entries left after compaction
-93 goto table entries
+504 of 951 action table entries left after compaction
+91 goto table entries
