@@ -1,29 +1,34 @@
-# README #
+# Compiler Project #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Implementation of a Compiler as a part of Language Translators Course.
 
-### What is this repository for? ###
+### Files
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* c.lex
+	* Contains the rules for Tokenizing the given c
+* test.c
+	* Contains sample C code
+* ast.sml
+	* Contains the datatypes for abstract syntax tree representation for C
+* sources.cm
+* code_gen.sml 
+* csub.grm 
+* driver.sml
+* errormsg.sml 
+* glue.sml
+* d.lex 
+* driver1.sml
+* tokens.sig
+	* Contains Signature of Tokens of C language
+* tokens.sml
+	* Contains Tokens of C language
+### Execution
+* run CM.make sources.cm to get executable
 
-### How do I get set up? ###
+### Contribution
+* Vinay - lexer , report 
+* Ayush - Ast , parser , grammar
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+### Team members
+* Vinay Krishna 111501004
+* Ayush Mittal 111501035
