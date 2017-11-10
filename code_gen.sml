@@ -47,6 +47,8 @@ fun binoptostring AST.Plus   = "+"
   | binoptostring AST.And    = "&&"  
   | binoptostring AST.Or     = "||"  
 
+fun extostring (AST.STMT(x)) = String.Concat([corestostring(x),"\n"])
+  | extostring _ = print "Error"
 
 
 fun convert_statements([],s) = s
