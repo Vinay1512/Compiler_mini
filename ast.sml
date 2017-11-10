@@ -14,7 +14,7 @@ struct
 	    | Gt | Lt | Gte | Lte | Eq | Neq | And | Or
 	
 	datatype unop
-	    = Not  | PreInc | PostInc | PreDec | PostDec
+	    = Not | Negate | PreInc | PostInc | PreDec | PostDec
 
 	datatype declaration
     	= VarDecl of id * (expression option)
